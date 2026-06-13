@@ -5,9 +5,7 @@ import { toast } from 'sonner';
 import { BrandFooter } from '@/components/BrandFooter';
 import { Dropzone } from '@/components/Dropzone';
 import { Header, type AppPhase } from '@/components/Header';
-import { ProgressSection } from '@/components/ProgressSection';
 import { ResultsTable } from '@/components/ResultsTable';
-import { StatsCards } from '@/components/StatsCards';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -15,6 +13,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { NewBatchSheet } from '@/components/NewBatchSheet';
 import { ConfirmProcessDialog } from '@/components/ConfirmProcessDialog';
+import { ExportProgressDialog } from '@/components/ExportProgressDialog';
 import { ProcessingDialog } from '@/components/ProcessingDialog';
 import {
   ExportSummaryDialog,
@@ -75,7 +74,6 @@ export function App() {
   );
 
   const hasResults = records.length > 0;
-  const showProcessingStats = stats.isProcessing && !hasResults;
   const showNewBatch = hasResults && !stats.isProcessing;
 
   const handleProcessClick = useCallback(() => {
@@ -154,42 +152,33 @@ export function App() {
           {phase === 'workspace' && (
             <motion.main
               key="workspace"
-              className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8"
+              className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8"
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
               {hasResults ? (
-                <>
-                  <motion.div variants={staggerItem} transition={easeOut}>
-                    <ProgressSection />
-                  </motion.div>
-                  <motion.div variants={staggerItem} transition={easeOut}>
-                    <ResultsTable />
-                  </motion.div>
-                </>
+                <motion.div variants={staggerItem} transition={easeOut}>
+                  <ResultsTable />
+                </motion.div>
               ) : (
-                <>
-                  <motion.div variants={staggerItem} transition={easeOut}>
+                !stats.isProcessing && (
+                  <motion.div
+                    variants={staggerItem}
+                    transition={easeOut}
+                    className="flex flex-1 flex-col justify-center"
+                  >
                     <Dropzone variant="compact" onProcess={handleProcessClick} />
                   </motion.div>
-                  <motion.div variants={staggerItem} transition={easeOut}>
-                    <ProgressSection />
-                  </motion.div>
-                  {showProcessingStats && (
-                    <motion.div variants={staggerItem} transition={easeOut}>
-                      <StatsCards />
-                    </motion.div>
-                  )}
-                </>
+                )
               )}
             </motion.main>
           )}
         </AnimatePresence>
-
-        <BrandFooter />
       </div>
+
+      <BrandFooter />
 
       <NewBatchSheet
         open={newBatchOpen}
@@ -206,6 +195,7 @@ export function App() {
       />
 
       <ProcessingDialog open={stats.isProcessing} onCancel={cancelProcessing} />
+      <ExportProgressDialog />
 
       <ExportSummaryDialog
         open={exportSummaryOpen}

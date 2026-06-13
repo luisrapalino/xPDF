@@ -56,7 +56,6 @@ export function useProcessing() {
       level: 'info',
     });
 
-    toast.info(`Procesando ${files.length.toLocaleString('es-CO')} PDFs…`);
     startTimeRef.current = performance.now();
     startTimer();
 
@@ -147,7 +146,8 @@ export function useProcessing() {
 
     appStore.setExporting(true);
     appStore.addLog({ fileName: 'Sistema', message: 'Generando archivo Excel...', level: 'info' });
-    const toastId = toast.loading('Generando export.xlsx…');
+
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 
     const summary: ExportSummaryData = {
       totalPdfs: appStore.stats.processedPdfs,
@@ -164,14 +164,13 @@ export function useProcessing() {
         level: 'success',
       });
       toast.success('Excel descargado', {
-        id: toastId,
         description: 'export.xlsx',
       });
       return summary;
     } catch (error) {
       const message = toUserErrorMessage(error, 'export');
       appStore.addLog({ fileName: 'Sistema', message, level: 'error' });
-      toast.error('No se pudo exportar el Excel', { id: toastId, description: message });
+      toast.error('No se pudo exportar el Excel', { description: message });
       return null;
     } finally {
       appStore.setExporting(false);

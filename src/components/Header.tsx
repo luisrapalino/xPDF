@@ -1,5 +1,6 @@
 import {
   FileSpreadsheet,
+  Loader2,
   Play,
 } from 'lucide-react';
 import { Logo } from '@/components/Logo';
@@ -45,8 +46,14 @@ export function Header({ phase, onProcess, onExport, showNewBatch, onNewBatch }:
               disabled={records.length === 0 || stats.isProcessing || stats.isExporting}
               onClick={onExport}
             >
-              <FileSpreadsheet className="size-4" />
-              <span className="hidden sm:inline">Exportar</span>
+              {stats.isExporting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="size-4" />
+              )}
+              <span className="hidden sm:inline">
+                {stats.isExporting ? 'Exportando…' : 'Exportar'}
+              </span>
             </Button>
           )}
 

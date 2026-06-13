@@ -2,6 +2,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { FileSpreadsheet, Play, Upload, type LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { BrandFooter } from '@/components/BrandFooter';
 import { Dropzone } from '@/components/Dropzone';
 import { Header, type AppPhase } from '@/components/Header';
 import { ProgressSection } from '@/components/ProgressSection';
@@ -102,7 +103,7 @@ export function App() {
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="min-h-screen">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <Toaster richColors closeButton position="bottom-right" />
       <Header
         phase={phase}
@@ -112,79 +113,83 @@ export function App() {
         onNewBatch={() => setNewBatchOpen(true)}
       />
 
-      <AnimatePresence mode="wait">
-        {phase === 'welcome' && (
-          <motion.main
-            key="welcome"
-            className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-lg flex-col items-stretch justify-center gap-6 px-4 py-12"
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={easeOut}
-          >
-            <Alert>
-              <AlertTitle>De PDFs a Excel en minutos</AlertTitle>
-              <AlertDescription>
-                Extrae datos de tus PDFs y exporta un Excel listo para usar.
-              </AlertDescription>
-            </Alert>
-            <WorkflowSteps activeStep={0} />
-            <Dropzone variant="hero" onProcess={handleProcessClick} />
-          </motion.main>
-        )}
+      <div className="scrollbar-subtle flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <AnimatePresence mode="wait">
+          {phase === 'welcome' && (
+            <motion.main
+              key="welcome"
+              className="mx-auto flex w-full max-w-lg flex-1 flex-col items-stretch justify-center gap-6 px-4 py-8"
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={easeOut}
+            >
+              <Alert>
+                <AlertTitle>De PDFs a Excel en minutos</AlertTitle>
+                <AlertDescription>
+                  Extrae datos de tus PDFs y exporta un Excel listo para usar.
+                </AlertDescription>
+              </Alert>
+              <WorkflowSteps activeStep={0} />
+              <Dropzone variant="hero" onProcess={handleProcessClick} />
+            </motion.main>
+          )}
 
-        {phase === 'ready' && (
-          <motion.main
-            key="ready"
-            className="mx-auto flex w-full max-w-2xl flex-col items-stretch gap-6 px-4 py-10"
-            variants={scaleIn}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={easeOut}
-          >
-            <WorkflowSteps activeStep={1} />
-            <Dropzone variant="compact" onProcess={handleProcessClick} />
-          </motion.main>
-        )}
+          {phase === 'ready' && (
+            <motion.main
+              key="ready"
+              className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-stretch justify-center gap-6 px-4 py-8"
+              variants={scaleIn}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={easeOut}
+            >
+              <WorkflowSteps activeStep={1} />
+              <Dropzone variant="compact" onProcess={handleProcessClick} />
+            </motion.main>
+          )}
 
-        {phase === 'workspace' && (
-          <motion.main
-            key="workspace"
-            className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            {hasResults ? (
-              <>
-                <motion.div variants={staggerItem} transition={easeOut}>
-                  <ProgressSection />
-                </motion.div>
-                <motion.div variants={staggerItem} transition={easeOut}>
-                  <ResultsTable />
-                </motion.div>
-              </>
-            ) : (
-              <>
-                <motion.div variants={staggerItem} transition={easeOut}>
-                  <Dropzone variant="compact" onProcess={handleProcessClick} />
-                </motion.div>
-                <motion.div variants={staggerItem} transition={easeOut}>
-                  <ProgressSection />
-                </motion.div>
-                {showProcessingStats && (
+          {phase === 'workspace' && (
+            <motion.main
+              key="workspace"
+              className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {hasResults ? (
+                <>
                   <motion.div variants={staggerItem} transition={easeOut}>
-                    <StatsCards />
+                    <ProgressSection />
                   </motion.div>
-                )}
-              </>
-            )}
-          </motion.main>
-        )}
-      </AnimatePresence>
+                  <motion.div variants={staggerItem} transition={easeOut}>
+                    <ResultsTable />
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  <motion.div variants={staggerItem} transition={easeOut}>
+                    <Dropzone variant="compact" onProcess={handleProcessClick} />
+                  </motion.div>
+                  <motion.div variants={staggerItem} transition={easeOut}>
+                    <ProgressSection />
+                  </motion.div>
+                  {showProcessingStats && (
+                    <motion.div variants={staggerItem} transition={easeOut}>
+                      <StatsCards />
+                    </motion.div>
+                  )}
+                </>
+              )}
+            </motion.main>
+          )}
+        </AnimatePresence>
+
+        <BrandFooter />
+      </div>
 
       <NewBatchSheet
         open={newBatchOpen}

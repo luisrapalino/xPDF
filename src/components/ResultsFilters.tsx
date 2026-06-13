@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { ChevronDown, RotateCcw, Search } from 'lucide-react';
 import { DateFilterPicker } from '@/components/DateFilterPicker';
 import { HintTooltip } from '@/components/HintTooltip';
@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/hooks/useAppStore';
 import { appStore } from '@/store/AppStore';
 import type { ResultFilters } from '@/models/Summary';
-import { collapsePanel, easeOut, staggerContainer, staggerItem } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 const textFilterFields: Array<{
   key: Exclude<keyof ResultFilters, 'globalSearch' | 'fecha'>;
@@ -75,68 +75,58 @@ export function ResultsFilters() {
         </div>
       </div>
 
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            key="advanced-filters"
-            variants={collapsePanel}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={easeOut}
-            className="overflow-hidden"
-          >
-            <motion.div
-              className="mt-5 space-y-4 border-t pt-5"
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-            >
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {textFilterFields.map(({ key, label, placeholder }) => (
-                  <motion.div key={key} variants={staggerItem} className="space-y-2">
-                    <Label htmlFor={key} className="text-xs">
-                      {label}
-                    </Label>
-                    <Input
-                      id={key}
-                      placeholder={placeholder}
-                      value={filters[key]}
-                      onChange={(e) => appStore.setFilters({ [key]: e.target.value })}
-                    />
-                  </motion.div>
-                ))}
-                <motion.div variants={staggerItem} className="space-y-2">
-                  <HintTooltip label="Filtra por fecha (mes/día/año)">
-                    <Label htmlFor="fecha" className="text-xs">
-                      Fecha
-                    </Label>
-                  </HintTooltip>
-                  <DateFilterPicker
-                    id="fecha"
-                    value={filters.fecha}
-                    onChange={(value) => appStore.setFilters({ fecha: value })}
-                    placeholder="Seleccionar fecha"
-                  />
-                </motion.div>
-              </div>
-              <motion.div variants={staggerItem}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    appStore.resetFilters();
-                    setExpanded(false);
-                  }}
-                >
-                  <RotateCcw className="size-4" />
-                  Restablecer filtros
-                </Button>
-              </motion.div>
-            </motion.div>
-          </motion.div>
+      <div
+        className={cn(
+          'grid transition-[grid-template-rows] duration-300 ease-out [overflow-anchor:none]',
+          expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
         )}
-      </AnimatePresence>
+      >
+        <div className="overflow-hidden">
+          <div className="mt-5 space-y-4 border-t pt-5">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {textFilterFields.map(({ key, label, placeholder }) => (
+                <div key={key} className="space-y-2">
+                  <Label htmlFor={key} className="text-xs">
+                    {label}
+                  </Label>
+                  <Input
+                    id={key}
+                    placeholder={placeholder}
+                    value={filters[key]}
+                    onChange={(e) => appStore.setFilters({ [key]: e.target.value })}
+                  />
+                </div>
+              ))}
+              <div className="space-y-2">
+                <HintTooltip label="Filtra por fecha (mes/día/año)">
+                  <Label htmlFor="fecha" className="text-xs">
+                    Fecha
+                  </Label>
+                </HintTooltip>
+                <DateFilterPicker
+                  id="fecha"
+                  value={filters.fecha}
+                  onChange={(value) => appStore.setFilters({ fecha: value })}
+                  placeholder="Seleccionar fecha"
+                />
+              </div>
+            </div>
+            <div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  appStore.resetFilters();
+                  setExpanded(false);
+                }}
+              >
+                <RotateCcw className="size-4" />
+                Restablecer filtros
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

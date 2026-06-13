@@ -83,7 +83,6 @@
   }
 
   html {
-    scrollbar-gutter: stable;
     background-color: var(--background);
   }
 
@@ -107,13 +106,15 @@
     @apply font-sans text-foreground antialiased;
     position: relative;
     z-index: 1;
-    min-height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     background: transparent;
   }
 }
 
 @layer utilities {
   .scrollbar-subtle {
+    scrollbar-gutter: stable;
     scrollbar-width: thin;
     scrollbar-color: color-mix(in oklch, var(--muted-foreground) 35%, transparent) transparent;
   }
